@@ -28,6 +28,18 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+exports.getStats = async (req, res) => {
+  try {
+    const stats = await orderService.getStats();
+
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
 // buscar por id
 exports.getProductById = async (req, res) => {
   try {
