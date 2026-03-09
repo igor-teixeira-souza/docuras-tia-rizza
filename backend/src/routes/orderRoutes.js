@@ -1,22 +1,15 @@
-const express = require("express")
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
-const orderController =
-  require("../controllers/orderController")
+const orderController = require("../controllers/orderController");
 
-router.post(
-  "/orders",
-  orderController.createOrder
-)
+console.log(orderController);
+router.post("/orders", orderController.createOrder);
 
-router.get(
-  "/orders",
-  orderController.getOrders
-)
+router.get("/orders/stats", orderController.getStats);
 
-router.patch(
-  "/orders/:id",
-  orderController.updateOrderStatus
-)
+router.get("/", orderController.getOrders);
 
-module.exports = router
+router.patch("/orders/:id/status", orderController.updateOrderStatus);
+
+module.exports = router;
