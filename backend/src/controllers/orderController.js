@@ -4,13 +4,16 @@ const Product = require("../models/Product");
 
 exports.createOrder = async (req, res) => {
   try {
-    const order = await orderService.createOrder(req.body);
+    const order = await Order.create(req.body);
+
+    // emitir socket
+    const io = req.app.get("io");
+
+    io.emit("newOrder", order);
 
     res.status(201).json(order);
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -27,31 +30,25 @@ exports.getOrders = async (req, res) => {
 };
 
 exports.updateOrderStatus = async (req, res) => {
-
   try {
-
     const order = await orderService.updateOrderStatus(
       req.params.id,
-      req.body.status
-    )
+      req.body.status,
+    );
 
-    res.json(order)
-
+    res.json(order);
   } catch (error) {
-
     res.status(400).json({
-      error: error.message
-    })
-
+      error: error.message,
+    });
   }
-
-}
+};
 
 exports.getStats = async (req, res) => {
   try {
-    const stats = await orderService.getStats()
-    res.json(stats)
+    const stats = await orderService.getStats();
+    res.json(stats);
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
-}
+};
