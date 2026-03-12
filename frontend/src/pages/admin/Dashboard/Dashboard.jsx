@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { api } from "../../api/api";
-import { socket } from "../../socket/socket";
+import { api } from "../../../api/api";
+import { socket } from "../../../socket/socket";
 
 export default function OrdersDashboard() {
   const [orders, setOrders] = useState([]);
