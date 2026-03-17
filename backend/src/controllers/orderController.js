@@ -4,15 +4,46 @@ const Product = require("../models/Product");
 
 exports.createOrder = async (req, res) => {
   try {
-    const order = await Order.create(req.body);
+    const {
+      customerName,
+      customer,
+      phone,
+      address,
+      products,
+      items,
+      total,
+    } = req.body;
+
+    // Compatibilidade com payloads antigos
+    const orderProducts =
+      products ||
+      (Array.isArray(items)
+        ? items.map((item) => ({
+            productId: item.productId || item.id,
+            quantity: item.quantity,
+            price: item.price,
+          }))
+        : []);
+
+    const orderPayload = {
+      customerName: customerName || customer,
+      phone,
+      address,
+      products: orderProducts,
+      total,
+    };
+
+    const order = await Order.create(orderPayload);
 
     // emitir socket
     const io = req.app.get("io");
-
-    io.emit("newOrder", order);
+    if (io) {
+      io.emit("newOrder", order);
+    }
 
     res.status(201).json(order);
   } catch (error) {
+    console.error("Erro ao criar pedido:", error);
     res.status(500).json({ error: error.message });
   }
 };

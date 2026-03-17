@@ -25,31 +25,38 @@ export const useCart = () => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
 
+  const getProductId = (product) => product?.id || product?._id;
+
   const addToCart = (product) => {
-    setCartItems(prev => {
-      const existing = prev.find(item => item.product.id === product.id);
+    const productId = getProductId(product);
+    let toastMessage = '';
+
+    setCartItems((prev) => {
+      const existing = prev.find((item) => getProductId(item.product) === productId);
       if (existing) {
-        toast.success('Quantidade atualizada no carrinho!');
-        return prev.map(item =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        toastMessage = 'Quantidade atualizada no carrinho!';
+        return prev.map((item) =>
+          getProductId(item.product) === productId ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      toast.success('Produto adicionado ao carrinho!');
-      return [...prev, { product, quantity: 1 }];
+      toastMessage = 'Produto adicionado ao carrinho!';
+      return [...prev, { product: { ...product, id: productId }, quantity: 1 }];
     });
+
+    if (toastMessage) toast.success(toastMessage);
   };
 
   const updateQuantity = (productId, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(prev =>
-      prev.map(item =>
-        item.product.id === productId ? { ...item, quantity: newQuantity } : item
+    setCartItems((prev) =>
+      prev.map((item) =>
+        getProductId(item.product) === productId ? { ...item, quantity: newQuantity } : item
       )
     );
   };
 
   const removeFromCart = (productId) => {
-    setCartItems(prev => prev.filter(item => item.product.id !== productId));
+    setCartItems((prev) => prev.filter((item) => getProductId(item.product) !== productId));
     toast.success('Produto removido do carrinho!');
   };
 

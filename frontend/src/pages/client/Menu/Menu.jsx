@@ -12,6 +12,9 @@ const Menu = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [priceMin, setPriceMin] = useState(0);
+  const [priceMax, setPriceMax] = useState(0);
+  const [sortOption, setSortOption] = useState("default");
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -20,13 +23,12 @@ const Menu = () => {
 
   useEffect(() => {
     filterProducts();
-  }, [selectedCategory, searchTerm, products]);
+  }, [selectedCategory, searchTerm, priceMin, priceMax, sortOption, products]);
 
   const fetchProducts = async () => {
     try {
       const response = await productsAPI.getAll();
-      // Verifica se response.data é um array
-      const productsData = Array.isArray(response.data) ? response.data : [];
+      const productsData = response.data?.data || [];
       setProducts(productsData);
       setFilteredProducts(productsData);
       const uniqueCategories = [
@@ -45,16 +47,45 @@ const Menu = () => {
 
   const filterProducts = () => {
     let filtered = [...products];
+
     if (selectedCategory !== "all") {
       filtered = filtered.filter((p) => p.category === selectedCategory);
     }
+
     if (searchTerm) {
+      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (p) =>
-          p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.description.toLowerCase().includes(searchTerm.toLowerCase()),
+          p.name.toLowerCase().includes(term) ||
+          p.description.toLowerCase().includes(term),
       );
     }
+
+    if (priceMin > 0) {
+      filtered = filtered.filter((p) => p.price >= priceMin);
+    }
+
+    if (priceMax > 0) {
+      filtered = filtered.filter((p) => p.price <= priceMax);
+    }
+
+    switch (sortOption) {
+      case "price-asc":
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case "name-asc":
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "name-desc":
+        filtered.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      default:
+        break;
+    }
+
     setFilteredProducts(filtered);
   };
 
@@ -68,6 +99,12 @@ const Menu = () => {
           categories={categories}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
+          priceMin={priceMin}
+          priceMax={priceMax}
+          onPriceMinChange={setPriceMin}
+          onPriceMaxChange={setPriceMax}
+          sortOption={sortOption}
+          onSortChange={setSortOption}
         />
         <ProductGrid
           products={filteredProducts}

@@ -1,22 +1,74 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 
-const MenuFilters = ({ searchTerm, onSearchChange, categories, selectedCategory, onCategoryChange }) => {
+const MenuFilters = ({
+  searchTerm,
+  onSearchChange,
+  categories,
+  selectedCategory,
+  onCategoryChange,
+  priceMin,
+  priceMax,
+  onPriceMinChange,
+  onPriceMaxChange,
+  sortOption,
+  onSortChange,
+}) => {
   return (
     <div className="bg-white rounded-xl shadow-md p-6 mb-8 animate-slide-up">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            placeholder="Buscar produtos..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-          />
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Buscar produtos..."
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Preço:</label>
+              <input
+                type="number"
+                min={0}
+                placeholder="Mín"
+                value={priceMin}
+                onChange={(e) => onPriceMinChange(Number(e.target.value))}
+                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+              <span className="text-gray-500">a</span>
+              <input
+                type="number"
+                min={0}
+                placeholder="Máx"
+                value={priceMax}
+                onChange={(e) => onPriceMaxChange(Number(e.target.value))}
+                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Ordenar:</label>
+              <select
+                value={sortOption}
+                onChange={(e) => onSortChange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              >
+                <option value="default">Padrão</option>
+                <option value="price-asc">Preço: menor para maior</option>
+                <option value="price-desc">Preço: maior para menor</option>
+                <option value="name-asc">Nome: A → Z</option>
+                <option value="name-desc">Nome: Z → A</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2 overflow-x-auto pb-2 md:pb-0">
+        <div className="flex items-center space-x-2 overflow-x-auto pb-2">
           <button
             onClick={() => onCategoryChange('all')}
             className={`px-4 py-2 rounded-lg transition-smooth whitespace-nowrap ${
@@ -25,7 +77,7 @@ const MenuFilters = ({ searchTerm, onSearchChange, categories, selectedCategory,
           >
             Todos
           </button>
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => onCategoryChange(cat)}

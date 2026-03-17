@@ -13,7 +13,7 @@ const ProductCard = ({ product, onAddToCart }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-smooth group animate-slide-up">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-smooth group animate-slide-up h-full flex flex-col">
       <div className="relative overflow-hidden h-48">
         {!imageLoaded && <div className="absolute inset-0 bg-gray-200 animate-pulse" />}
         <img
@@ -30,10 +30,12 @@ const ProductCard = ({ product, onAddToCart }) => {
           <Check size={16} />
         </div>
       </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
-        <div className="flex items-center justify-between">
+      <div className="p-4 flex flex-col flex-1">
+        <div>
+          <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
+          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+        </div>
+        <div className="mt-auto flex items-center justify-between">
           <span className="text-xl font-bold text-black">R$ {product.price?.toFixed(2)}</span>
           <Button size="sm" onClick={handleAddToCart} className="flex items-center space-x-1">
             <ShoppingCart size={16} />

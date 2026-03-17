@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '../../../components/ui/Button';
 
-const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
+const CheckoutForm = ({ formData, phoneValue, errors, onChange, onSubmit, loading }) => {
   return (
     <form onSubmit={onSubmit} className="bg-white rounded-xl shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6">Dados para Entrega</h2>
@@ -29,7 +29,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
           <input
             type="tel"
             name="phone"
-            value={formData.phone}
+            value={phoneValue}
             onChange={onChange}
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black ${
               errors.phone ? 'border-red-500' : 'border-gray-300'

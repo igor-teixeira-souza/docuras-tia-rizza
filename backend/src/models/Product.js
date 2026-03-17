@@ -23,4 +23,13 @@ const ProductSchema = new mongoose.Schema({
   },
 });
 
+// Permite acessar `product.id` no frontend sem precisar usar _id
+ProductSchema.virtual("id").get(function () {
+  return this._id.toHexString();
+});
+
+ProductSchema.set("toJSON", {
+  virtuals: true,
+});
+
 module.exports = mongoose.model("Product", ProductSchema);

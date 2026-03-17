@@ -19,17 +19,36 @@ const Checkout = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderNumber, setOrderNumber] = useState(null);
 
+  const formatPhone = (value) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    if (!digits) return '';
+
+    if (digits.length <= 2) return `(${digits}`;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10)
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+
+    if (name === 'phone') {
+      const digits = value.replace(/\D/g, '');
+      setFormData((prev) => ({ ...prev, phone: digits }));
+      if (errors.phone) setErrors((prev) => ({ ...prev, phone: '' }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const validateForm = () => {
     const newErrors = {};
     if (!formData.customerName.trim()) newErrors.customerName = 'Nome é obrigatório';
     if (!formData.phone.trim()) newErrors.phone = 'Telefone é obrigatório';
-    else if (!/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(formData.phone)) newErrors.phone = 'Telefone inválido';
+    else if (!/^\d{10,11}$/.test(formData.phone)) newErrors.phone = 'Telefone inválido';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -49,11 +68,11 @@ const Checkout = () => {
     setLoading(true);
     try {
       const orderData = {
-        customer: formData.customerName,
-        phone: formData.phone,
+        customerName: formData.customerName,
+        phone: formData.phone.replace(/\D/g, ''),
         address: formData.address || undefined,
-        items: cartItems.map(item => ({
-          productId: item.product.id,
+        products: cartItems.map((item) => ({
+          productId: item.product.id || item.product._id,
           quantity: item.quantity,
           price: item.product.price,
         })),
@@ -90,6 +109,7 @@ const Checkout = () => {
           <div className="lg:col-span-2">
             <CheckoutForm
               formData={formData}
+              phoneValue={formatPhone(formData.phone)}
               errors={errors}
               onChange={handleChange}
               onSubmit={handleSubmit}
