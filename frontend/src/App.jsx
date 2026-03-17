@@ -1,27 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import Menu from "./pages/client/Menu";
-import Cart from "./pages/client/Cart";
-import Checkout from "./pages/client/Checkout";
-
-import OrderDashboard from "./pages/admin/OrderDashboard";
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import AppRoutes from './routes/AppRoutes';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* SITE DO CLIENTE */}
-
-        <Route path="/" element={<Menu />} />
-
-        <Route path="/cart" element={<Cart />} />
-
-        <Route path="/checkout" element={<Checkout />} />
-
-        {/* PAINEL ADMIN */}
-
-        <Route path="/admin" element={<OrderDashboard />} />
-      </Routes>
+      <Toaster position="bottom-right" />
+      <AppRoutes />
     </BrowserRouter>
   );
 }
