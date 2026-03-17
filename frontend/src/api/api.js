@@ -15,5 +15,5 @@ export const productsAPI = {
 export const ordersAPI = {
   create: (orderData) => api.post("/orders", orderData),
   getStats: () => api.get("/orders/stats"),
-  // getAll: () => api.get("/orders")  // se houver endpoint para listar todos
+  getAll: () => api.get("/orders"),  // se houver endpoint para listar todos
 };

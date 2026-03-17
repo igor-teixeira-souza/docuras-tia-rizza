@@ -4,6 +4,7 @@ import Button from '../../../components/ui/Button';
 import Loader from '../../../components/ui/Loader';
 import ProductTable from './ProductTable';
 import ProductForm from './ProductForm';
+import { toast } from 'react-hot-toast';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -16,11 +17,16 @@ const Products = () => {
   }, []);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
       const response = await productsAPI.getAll();
-      setProducts(response.data || []);
+      // Garantir que response.data seja um array
+      const productsData = Array.isArray(response.data) ? response.data : [];
+      setProducts(productsData);
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
+      toast.error('Erro ao carregar produtos');
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -29,17 +35,20 @@ const Products = () => {
   const handleSave = async (productData) => {
     try {
       if (editingProduct) {
-        // Atualizar (PUT /api/products/:id) - implementar se existir
-        // await productsAPI.update(editingProduct.id, productData);
+        // Atualizar produto existente
+        await productsAPI.update(editingProduct.id, productData);
+        toast.success('Produto atualizado com sucesso!');
       } else {
-        // Criar (POST /api/products)
-        // await productsAPI.create(productData);
+        // Criar novo produto
+        await productsAPI.create(productData);
+        toast.success('Produto criado com sucesso!');
       }
-      fetchProducts();
+      fetchProducts(); // Recarrega a lista
       setShowForm(false);
       setEditingProduct(null);
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
+      toast.error('Erro ao salvar produto');
     }
   };
 
@@ -51,10 +60,12 @@ const Products = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir este produto?')) {
       try {
-        // await productsAPI.delete(id);
-        fetchProducts();
+        await productsAPI.delete(id);
+        toast.success('Produto excluído com sucesso!');
+        fetchProducts(); // Recarrega a lista
       } catch (error) {
         console.error('Erro ao excluir produto:', error);
+        toast.error('Erro ao excluir produto');
       }
     }
   };

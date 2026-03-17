@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import MenuHeader from './MenuHeader';
-import MenuFilters from './MenuFilters';
-import ProductGrid from './ProductGrid';
-import { productsAPI } from '../../../api/api';
-import { useCart } from '../../../hooks/useCart';
+import React, { useState, useEffect } from "react";
+import MenuHeader from "./MenuHeader";
+import MenuFilters from "./MenuFilters";
+import ProductGrid from "./ProductGrid";
+import { productsAPI } from "../../../api/api";
+import { useCart } from "../../../hooks/useCart";
 
 const Menu = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -25,13 +25,19 @@ const Menu = () => {
   const fetchProducts = async () => {
     try {
       const response = await productsAPI.getAll();
-      const productsData = response.data || [];
+      // Verifica se response.data é um array
+      const productsData = Array.isArray(response.data) ? response.data : [];
       setProducts(productsData);
       setFilteredProducts(productsData);
-      const uniqueCategories = [...new Set(productsData.map(p => p.category))];
+      const uniqueCategories = [
+        ...new Set(productsData.map((p) => p.category).filter(Boolean)),
+      ];
       setCategories(uniqueCategories);
     } catch (error) {
-      console.error('Erro ao carregar produtos:', error);
+      console.error("Erro ao carregar produtos:", error);
+      setProducts([]);
+      setFilteredProducts([]);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -39,13 +45,14 @@ const Menu = () => {
 
   const filterProducts = () => {
     let filtered = [...products];
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(p => p.category === selectedCategory);
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((p) => p.category === selectedCategory);
     }
     if (searchTerm) {
-      filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.description.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
     setFilteredProducts(filtered);
@@ -62,7 +69,11 @@ const Menu = () => {
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
         />
-        <ProductGrid products={filteredProducts} loading={loading} onAddToCart={addToCart} />
+        <ProductGrid
+          products={filteredProducts}
+          loading={loading}
+          onAddToCart={addToCart}
+        />
       </div>
     </div>
   );
