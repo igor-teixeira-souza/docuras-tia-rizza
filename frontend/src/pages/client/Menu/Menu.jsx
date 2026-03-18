@@ -5,6 +5,17 @@ import ProductGrid from "./ProductGrid";
 import { productsAPI } from "../../../api/api";
 import { useCart } from "../../../hooks/useCart";
 
+const PRICE_RANGES = [
+  { value: 'all', label: 'Todos os preços', min: 0, max: 0 },
+  { value: 'upto-10', label: 'Até R$10', min: 0, max: 10 },
+  { value: '10-20', label: 'R$10 - R$20', min: 10, max: 20 },
+  { value: '20-30', label: 'R$20 - R$30', min: 20, max: 30 },
+  { value: '30-50', label: 'R$30 - R$50', min: 30, max: 50 },
+  { value: '50-75', label: 'R$50 - R$75', min: 50, max: 75 },
+  { value: '75-100', label: 'R$75 - R$100', min: 75, max: 100 },
+  { value: '100+', label: 'Acima de R$100', min: 100, max: 0 },
+];
+
 const Menu = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -14,8 +25,19 @@ const Menu = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(0);
+  const [selectedPriceRange, setSelectedPriceRange] = useState('all');
   const [sortOption, setSortOption] = useState("default");
   const { addToCart } = useCart();
+
+  const handlePriceRangeChange = (value) => {
+    setSelectedPriceRange(value);
+    const range = PRICE_RANGES.find((r) => r.value === value);
+
+    if (range) {
+      setPriceMin(range.min);
+      setPriceMax(range.max);
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -99,10 +121,8 @@ const Menu = () => {
           categories={categories}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
-          priceMin={priceMin}
-          priceMax={priceMax}
-          onPriceMinChange={setPriceMin}
-          onPriceMaxChange={setPriceMax}
+          selectedPriceRange={selectedPriceRange}
+          onPriceRangeChange={handlePriceRangeChange}
           sortOption={sortOption}
           onSortChange={setSortOption}
         />

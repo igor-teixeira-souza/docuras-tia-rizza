@@ -31,6 +31,7 @@ exports.createOrder = async (req, res) => {
       address,
       products: orderProducts,
       total,
+      userId: req.user.userId, // Adicionar userId do usuário autenticado
     };
 
     const order = await Order.create(orderPayload);

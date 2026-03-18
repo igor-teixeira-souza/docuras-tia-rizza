@@ -7,7 +7,7 @@ import { Sparkles, ArrowRight } from 'lucide-react';
 
 const FeaturedProducts = ({ products, loading, onAddToCart }) => {
   return (
-    <section className="mt-16">
+    <section id="destaques" className="mt-16">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-2">
           <Sparkles className="text-pink-600" />

@@ -44,12 +44,11 @@ const AdminNavbar = () => {
                 <Link
                   to={item.to}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-smooth ${
-                    isActive(item.to) ? 'bg-black text-white' : 'hover:bg-gray-100'
-                  }`}
+                  className={`group flex items-center space-x-3 px-4 py-3 rounded-lg transition-smooth ${isActive(item.to) ? 'bg-black text-white' : 'hover:bg-gray-100'}`}
                 >
                   <item.icon size={20} />
                   <span>{item.label}</span>
+                  <div className={`h-0.5 bg-pink-600 transition-all duration-300 ${isActive(item.to) ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
                 </Link>
               </li>
             ))}

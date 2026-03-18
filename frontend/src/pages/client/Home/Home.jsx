@@ -29,8 +29,8 @@ const Home = () => {
 
   return (
     <div className="pt-16">
+      <HeroSection />
       <div className="container-custom py-8">
-        <HeroSection />
         <PromoBanner />
         <FeaturedProducts products={featuredProducts} loading={loading} onAddToCart={addToCart} />
         <QualityCards />
