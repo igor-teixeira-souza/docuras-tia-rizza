@@ -4,15 +4,8 @@ const Product = require("../models/Product");
 
 exports.createOrder = async (req, res) => {
   try {
-    const {
-      customerName,
-      customer,
-      phone,
-      address,
-      products,
-      items,
-      total,
-    } = req.body;
+    const { customerName, customer, phone, address, products, items, total } =
+      req.body;
 
     // Compatibilidade com payloads antigos
     const orderProducts =
@@ -63,16 +56,18 @@ exports.getOrders = async (req, res) => {
 
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const order = await orderService.updateOrderStatus(
+    const { status } = req.body;
+    const order = await Order.findByIdAndUpdate(
       req.params.id,
-      req.body.status,
+      { status },
+      { new: true },
     );
-
+    if (!order) {
+      return res.status(404).json({ error: "Pedido não encontrado" });
+    }
     res.json(order);
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 

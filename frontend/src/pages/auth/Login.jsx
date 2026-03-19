@@ -21,8 +21,13 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate("/");
+      const user = await login(email, password);
+      // Redireciona baseado na role
+      if (user?.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.response?.data?.error || "E-mail ou senha inválidos.");
     } finally {
@@ -61,7 +66,10 @@ export default function Login() {
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 E-mail
               </label>
               <input
@@ -78,7 +86,10 @@ export default function Login() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Senha
               </label>
               <div className="relative">
@@ -112,22 +123,37 @@ export default function Login() {
                 type="checkbox"
                 className="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              <label
+                htmlFor="remember-me"
+                className="ml-2 block text-sm text-gray-900"
+              >
                 Lembrar-me
               </label>
             </div>
             <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-pink-600 hover:text-pink-500">
+              <Link
+                to="/forgot-password"
+                className="font-medium text-pink-600 hover:text-pink-500"
+              >
                 Esqueceu a senha?
               </Link>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button type="submit" disabled={loading} className="flex-1 flex justify-center">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="flex-1 flex justify-center"
+            >
               {loading ? <Loader size="sm" /> : "Entrar"}
             </Button>
-            <Button type="button" variant="secondary" onClick={handleCancel} className="flex-1 flex justify-center">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleCancel}
+              className="flex-1 flex justify-center"
+            >
               Cancelar
             </Button>
           </div>

@@ -1,31 +1,41 @@
-import React from 'react';
-import { Package, DollarSign, Clock, TrendingUp } from 'lucide-react';
+import React from "react";
 
-const StatsCards = ({ stats }) => {
-  const cards = [
-    { label: 'Total de Pedidos', value: stats.totalOrders, icon: Package, bg: 'bg-secondary' },
-    { label: 'Faturamento Total', value: `R$ ${stats.totalRevenue.toFixed(2)}`, icon: DollarSign, bg: 'bg-secondary' },
-    { label: 'Pedidos Pendentes', value: stats.pendingOrders, icon: Clock, bg: 'bg-secondary' },
-    { label: 'Ticket Médio', value: `R$ ${(stats.totalRevenue / stats.totalOrders || 0).toFixed(2)}`, icon: TrendingUp, bg: 'bg-secondary' },
-  ];
+const StatsCard = ({
+  title,
+  value,
+  icon: Icon,
+  color = "bg-secondary",
+  trend,
+}) => {
+  // Verificação para evitar erro se Icon não for passado
+  if (!Icon) {
+    console.warn('StatsCard: a propriedade "icon" é obrigatória');
+    return null;
+  }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {cards.map((card, idx) => (
-        <div key={idx} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-smooth">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-sm">{card.label}</p>
-              <p className="text-3xl font-bold">{card.value}</p>
-            </div>
-            <div className={`w-12 h-12 ${card.bg} rounded-full flex items-center justify-center`}>
-              <card.icon className="text-black" size={24} />
-            </div>
-          </div>
+    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-smooth">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-gray-500 font-medium">{title}</p>
+          <p className="text-3xl font-bold mt-1">{value}</p>
+          {trend && (
+            <p
+              className={`text-sm mt-2 ${trend > 0 ? "text-green-600" : "text-red-600"}`}
+            >
+              {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}% em relação ao mês
+              passado
+            </p>
+          )}
         </div>
-      ))}
+        <div
+          className={`w-14 h-14 ${color} rounded-full flex items-center justify-center`}
+        >
+          <Icon className="text-current" size={28} />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default StatsCards;
+export default StatsCard;

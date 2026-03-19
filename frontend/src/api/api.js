@@ -45,3 +45,16 @@ export const ordersAPI = {
   getAll: () => api.get("/orders"),
   updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }),
 };
+
+export const promotionsAPI = {
+  getAll: () => api.get("/promotions"),
+  getById: (id) => api.get(`/promotions/${id}`),
+  create: (data) => api.post("/promotions", data),
+  update: (id, data) => api.put(`/promotions/${id}`, data),
+  delete: (id) => api.delete(`/promotions/${id}`),
+};
+
+export const settingsAPI = {
+  get: () => api.get("/settings"),
+  update: (data) => api.put("/settings", data),
+};

@@ -8,7 +8,7 @@ const ClientNavbar = ({ cartCount }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -23,9 +23,7 @@ const ClientNavbar = ({ cartCount }) => {
   ];
 
   return (
-    <nav
-      className={`fixed top-0 w-full z-50 transition-smooth ${scrolled ? "bg-white shadow-lg" : "bg-primary"}`}
-    >
+    <nav className="...">
       <div className="container-custom">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-bold text-black">
@@ -46,7 +44,6 @@ const ClientNavbar = ({ cartCount }) => {
                     {badge}
                   </span>
                 )}
-                {/* Linha indicadora: só aparece em hover a partir de md */}
                 <div
                   className={`absolute bottom-0 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
                     location.pathname === to
@@ -56,6 +53,28 @@ const ClientNavbar = ({ cartCount }) => {
                 ></div>
               </Link>
             ))}
+
+            {/* ✅ LINK ADMIN - só aparece para admins */}
+            {isAuthenticated && isAdmin && (
+              <Link
+                to="/admin"
+                className={`group relative flex items-center px-3 py-2 rounded-lg transition-smooth hover:bg-white ${
+                  location.pathname.startsWith("/admin")
+                    ? "bg-white font-semibold"
+                    : ""
+                }`}
+              >
+                <span>Admin</span>
+                <div
+                  className={`absolute bottom-0 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
+                    location.pathname.startsWith("/admin")
+                      ? "w-full"
+                      : "w-0 md:group-hover:w-full"
+                  }`}
+                ></div>
+              </Link>
+            )}
+
             {isAuthenticated ? <UserMenu /> : <AuthButtons />}
           </div>
           <button
@@ -89,7 +108,6 @@ const ClientNavbar = ({ cartCount }) => {
                     {badge}
                   </span>
                 )}
-                {/* Linha indicadora: no mobile só aparece quando ativa */}
                 <div
                   className={`absolute bottom-0 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
                     location.pathname === to ? "w-full" : "w-0"
@@ -97,6 +115,25 @@ const ClientNavbar = ({ cartCount }) => {
                 ></div>
               </Link>
             ))}
+
+            {/* ✅ LINK ADMIN no mobile */}
+            {isAuthenticated && isAdmin && (
+              <Link
+                to="/admin"
+                className={`group relative flex items-center px-4 py-2 rounded-lg transition-smooth hover:bg-white ${
+                  location.pathname.startsWith("/admin") ? "bg-white" : ""
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                <span>Admin</span>
+                <div
+                  className={`absolute bottom-0 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
+                    location.pathname.startsWith("/admin") ? "w-full" : "w-0"
+                  }`}
+                ></div>
+              </Link>
+            )}
+
             <div className="pt-4 border-t border-gray-200">
               {isAuthenticated ? <UserMenu mobile /> : <AuthButtons mobile />}
             </div>

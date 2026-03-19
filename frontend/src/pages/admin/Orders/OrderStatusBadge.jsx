@@ -18,12 +18,10 @@ const statusLabels = {
   cancelled: 'Cancelado',
 };
 
-const OrderStatusBadge = ({ status }) => {
-  return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || 'bg-gray-100'}`}>
-      {statusLabels[status] || status}
-    </span>
-  );
-};
+const OrderStatusBadge = ({ status }) => (
+  <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || 'bg-gray-100'}`}>
+    {statusLabels[status] || status}
+  </span>
+);
 
 export default OrderStatusBadge;

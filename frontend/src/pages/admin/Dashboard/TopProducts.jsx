@@ -1,7 +1,20 @@
-import React from 'react';
-import { Star } from 'lucide-react';
+import React from "react";
+import { Star } from "lucide-react";
 
-const TopProducts = ({ products }) => {
+const TopProducts = ({ products = [] }) => {
+  // ✅ valor padrão
+  if (!products || products.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4 flex items-center">
+          <Star className="mr-2 text-yellow-500" size={20} />
+          Produtos Mais Vendidos
+        </h2>
+        <p className="text-gray-500 text-center py-4">Nenhum dado disponível</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       <h2 className="text-xl font-semibold mb-4 flex items-center">

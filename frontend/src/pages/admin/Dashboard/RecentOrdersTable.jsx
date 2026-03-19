@@ -1,7 +1,17 @@
-import React from 'react';
-import OrderStatusBadge from '../Orders/OrderStatusBadge';
+import React from "react";
+import OrderStatusBadge from "./../Orders/OrderStatusBadge";
 
-const RecentOrdersTable = ({ orders }) => {
+const RecentOrdersTable = ({ orders = [] }) => {
+  // ✅ valor padrão
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Pedidos Recentes</h2>
+        <p className="text-gray-500 text-center py-4">Nenhum pedido recente</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       <h2 className="text-xl font-semibold mb-4">Pedidos Recentes</h2>
@@ -17,11 +27,16 @@ const RecentOrdersTable = ({ orders }) => {
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order.id} className="border-b hover:bg-gray-50 transition-smooth">
+              <tr
+                key={order.id}
+                className="border-b hover:bg-gray-50 transition-smooth"
+              >
                 <td className="py-3">{order.customer}</td>
-                <td><OrderStatusBadge status={order.status} /></td>
-                <td>R$ {order.total.toFixed(2)}</td>
-                <td>{new Date(order.date).toLocaleDateString('pt-BR')}</td>
+                <td>
+                  <OrderStatusBadge status={order.status} />
+                </td>
+                <td>R$ {order.total?.toFixed(2)}</td>
+                <td>{new Date(order.date).toLocaleDateString("pt-BR")}</td>
               </tr>
             ))}
           </tbody>

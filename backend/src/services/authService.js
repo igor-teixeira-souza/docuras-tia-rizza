@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 exports.register = async (userData) => {
   const { name, email, password, phone } = userData;
 
-  // Verificar se usuário já existe
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new Error("Usuário já existe com este email");
@@ -15,27 +14,24 @@ exports.register = async (userData) => {
     email,
     password,
     phone,
+    role: "user", // sempre user
   });
 
-  return await user.save();
+  await user.save();
+  return { message: "Usuário criado com sucesso" };
 };
 
 exports.login = async (email, password) => {
   const user = await User.findOne({ email });
-  if (!user) {
-    throw new Error("Credenciais inválidas");
-  }
+  if (!user) throw new Error("Credenciais inválidas");
 
-  const isValidPassword = await user.comparePassword(password);
-  if (!isValidPassword) {
-    throw new Error("Credenciais inválidas");
-  }
+  const isValid = await user.comparePassword(password); // método do modelo
+  if (!isValid) throw new Error("Credenciais inválidas");
 
-  // Gerar token JWT
   const token = jwt.sign(
-    { userId: user._id, role: user.role },
+    { id: user._id, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: "7d" }
+    { expiresIn: "7d" },
   );
 
   return {
@@ -59,7 +55,9 @@ exports.getProfile = async (userId) => {
 };
 
 exports.updateProfile = async (userId, updateData) => {
-  const user = await User.findByIdAndUpdate(userId, updateData, { new: true }).select("-password");
+  const user = await User.findByIdAndUpdate(userId, updateData, {
+    new: true,
+  }).select("-password");
   if (!user) {
     throw new Error("Usuário não encontrado");
   }

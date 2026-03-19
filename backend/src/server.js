@@ -8,8 +8,12 @@ const { Server } = require("socket.io");
 const connectDB = require("./database/mongo");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const usersRoutes = require("./routes/UsersRoutes"); // ou "./routes/usersRoutes"
 const authRoutes = require("./routes/authRoutes");
-
+const User = require("./models/User");
+const settingsRoutes = require('./routes/settingsRoutes');
+const promotionRoutes = require('./routes/promotionRoutes');
+const bcrypt = require("bcrypt");
 const app = express();
 
 // Conectar banco
@@ -24,6 +28,9 @@ app.use("/images", express.static("src/uploads"));
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/promotions', promotionRoutes);
 
 // Rota raiz
 app.get("/", (req, res) => {
@@ -39,6 +46,23 @@ const io = new Server(server, {
     origin: "*",
   },
 });
+
+const createAdminIfNotExists = async () => {
+  const adminEmail = "admin@docurastiarizza.com";
+  const existingAdmin = await User.findOne({ email: adminEmail });
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash("sua-senha-segura-aqui", 10);
+    await User.create({
+      name: "Administrador",
+      email: adminEmail,
+      password: hashedPassword,
+      role: "admin",
+    });
+    console.log("✅ Administrador criado com sucesso!");
+  }
+};
+
+createAdminIfNotExists();
 
 // Conexão socket
 io.on("connection", (socket) => {

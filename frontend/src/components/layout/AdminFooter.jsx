@@ -1,0 +1,34 @@
+import React from "react";
+
+const AdminFooter = ({ sidebarOpen }) => {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer
+      className={`bg-white border-t border-gray-200 py-4 px-6 transition-all duration-300 ${
+        sidebarOpen ? "md:ml-64" : "md:ml-20"
+      }`}
+    >
+      <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
+        <p>&copy; {currentYear} Doçuras da Tia Rizza. Painel Administrativo</p>
+        <div className="flex space-x-4 mt-2 md:mt-0">
+          <a href="/termos" className="hover:text-pink-600 transition-smooth">
+            Termos
+          </a>
+          <a
+            href="/privacidade"
+            className="hover:text-pink-600 transition-smooth"
+          >
+            Privacidade
+          </a>
+          <a href="/ajuda" className="hover:text-pink-600 transition-smooth">
+            Ajuda
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default AdminFooter;
+    
