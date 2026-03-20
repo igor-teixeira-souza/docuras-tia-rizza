@@ -1,43 +1,31 @@
 import React, { useState, useEffect } from "react";
+import { productsAPI } from "../../../api/api";
+import { useCart } from "../../../hooks/useCart";
 import MenuHeader from "./MenuHeader";
 import MenuFilters from "./MenuFilters";
 import ProductGrid from "./ProductGrid";
-import { productsAPI } from "../../../api/api";
-import { useCart } from "../../../hooks/useCart";
+import Loader from "../../../components/ui/Loader";
+import { toast } from "react-hot-toast";
 
-const PRICE_RANGES = [
-  { value: 'all', label: 'Todos os preços', min: 0, max: 0 },
-  { value: 'upto-10', label: 'Até R$10', min: 0, max: 10 },
-  { value: '10-20', label: 'R$10 - R$20', min: 10, max: 20 },
-  { value: '20-30', label: 'R$20 - R$30', min: 20, max: 30 },
-  { value: '30-50', label: 'R$30 - R$50', min: 30, max: 50 },
-  { value: '50-75', label: 'R$50 - R$75', min: 50, max: 75 },
-  { value: '75-100', label: 'R$75 - R$100', min: 75, max: 100 },
-  { value: '100+', label: 'Acima de R$100', min: 100, max: 0 },
+const priceRanges = [
+  { min: null, max: null },
+  { min: 0, max: 20 },
+  { min: 20, max: 50 },
+  { min: 50, max: 100 },
+  { min: 100, max: null },
 ];
 
 const Menu = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(0);
-  const [selectedPriceRange, setSelectedPriceRange] = useState('all');
-  const [sortOption, setSortOption] = useState("default");
+  const [selectedPriceRange, setSelectedPriceRange] = useState(0); // índice 0 = todos
+  const [sortBy, setSortBy] = useState("name_asc");
   const { addToCart } = useCart();
-
-  const handlePriceRangeChange = (value) => {
-    setSelectedPriceRange(value);
-    const range = PRICE_RANGES.find((r) => r.value === value);
-
-    if (range) {
-      setPriceMin(range.min);
-      setPriceMax(range.max);
-    }
-  };
 
   useEffect(() => {
     fetchProducts();
@@ -45,23 +33,24 @@ const Menu = () => {
 
   useEffect(() => {
     filterProducts();
-  }, [selectedCategory, searchTerm, priceMin, priceMax, sortOption, products]);
+  }, [selectedCategory, searchTerm, selectedPriceRange, sortBy, products]);
 
   const fetchProducts = async () => {
     try {
       const response = await productsAPI.getAll();
-      const productsData = response.data?.data || [];
+      let productsData = [];
+      if (Array.isArray(response.data)) productsData = response.data;
+      else if (response.data?.products) productsData = response.data.products;
+      else productsData = [];
+
       setProducts(productsData);
-      setFilteredProducts(productsData);
-      const uniqueCategories = [
+      const cats = [
         ...new Set(productsData.map((p) => p.category).filter(Boolean)),
       ];
-      setCategories(uniqueCategories);
-    } catch (error) {
-      console.error("Erro ao carregar produtos:", error);
-      setProducts([]);
-      setFilteredProducts([]);
-      setCategories([]);
+      setCategories(cats);
+    } catch (err) {
+      setError("Erro ao carregar produtos.");
+      toast.error("Erro de conexão com o servidor.");
     } finally {
       setLoading(false);
     }
@@ -70,46 +59,70 @@ const Menu = () => {
   const filterProducts = () => {
     let filtered = [...products];
 
+    // Categoria
     if (selectedCategory !== "all") {
       filtered = filtered.filter((p) => p.category === selectedCategory);
     }
 
+    // Busca
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (p) =>
-          p.name.toLowerCase().includes(term) ||
-          p.description.toLowerCase().includes(term),
+          p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.description?.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
-    if (priceMin > 0) {
-      filtered = filtered.filter((p) => p.price >= priceMin);
+    // Faixa de preço
+    const { min, max } = priceRanges[selectedPriceRange];
+    if (min !== null) {
+      filtered = filtered.filter((p) => p.price >= min);
+    }
+    if (max !== null) {
+      filtered = filtered.filter((p) => p.price <= max);
     }
 
-    if (priceMax > 0) {
-      filtered = filtered.filter((p) => p.price <= priceMax);
-    }
-
-    switch (sortOption) {
-      case "price-asc":
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case "price-desc":
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case "name-asc":
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "name-desc":
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      default:
-        break;
-    }
+    // Ordenação
+    const [field, order] = sortBy.split("_");
+    filtered.sort((a, b) => {
+      if (field === "name") {
+        return order === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      } else if (field === "price") {
+        return order === "asc" ? a.price - b.price : b.price - a.price;
+      }
+      return 0;
+    });
 
     setFilteredProducts(filtered);
   };
+
+  if (loading) {
+    return (
+      <div className="pt-16">
+        <div className="container-custom py-8">
+          <MenuHeader />
+          <div className="flex justify-center py-12">
+            <Loader size="lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="pt-16">
+        <div className="container-custom py-8">
+          <MenuHeader />
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-16">
@@ -122,15 +135,11 @@ const Menu = () => {
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
           selectedPriceRange={selectedPriceRange}
-          onPriceRangeChange={handlePriceRangeChange}
-          sortOption={sortOption}
-          onSortChange={setSortOption}
+          onPriceRangeChange={setSelectedPriceRange}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
         />
-        <ProductGrid
-          products={filteredProducts}
-          loading={loading}
-          onAddToCart={addToCart}
-        />
+        <ProductGrid products={filteredProducts} onAddToCart={addToCart} />
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { promotionsAPI } from '../../../api/api';
-import Button from '../../../components/ui/Button';
-import Loader from '../../../components/ui/Loader';
-import PromotionForm from './PromotionForm';
-import { toast } from 'react-hot-toast';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { promotionsAPI } from "../../../api/api";
+import Button from "../../../components/ui/Button";
+import Loader from "../../../components/ui/Loader";
+import PromotionForm from "./PromotionForm";
+import { toast } from "react-hot-toast";
+import { Edit, Trash2, Eye } from "lucide-react";
 
 const Promotions = () => {
   const [promotions, setPromotions] = useState([]);
@@ -17,7 +17,7 @@ const Promotions = () => {
       const response = await promotionsAPI.getAll();
       setPromotions(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      toast.error('Erro ao carregar promoções');
+      toast.error("Erro ao carregar promoções");
     } finally {
       setLoading(false);
     }
@@ -31,27 +31,32 @@ const Promotions = () => {
     try {
       if (editingPromo) {
         await promotionsAPI.update(editingPromo.id, promoData);
-        toast.success('Promoção atualizada!');
+        toast.success("Promoção atualizada!");
       } else {
         await promotionsAPI.create(promoData);
-        toast.success('Promoção criada!');
+        toast.success("Promoção criada!");
       }
       fetchPromotions();
       setShowForm(false);
       setEditingPromo(null);
     } catch (error) {
-      toast.error('Erro ao salvar promoção');
+      toast.error("Erro ao salvar promoção");
     }
   };
 
+  const handleEdit = (promo) => {
+    setEditingPromo(promo);
+    setShowForm(true);
+  };
+
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir esta promoção?')) {
+    if (window.confirm("Tem certeza que deseja excluir esta promoção?")) {
       try {
         await promotionsAPI.delete(id);
-        toast.success('Promoção excluída');
+        toast.success("Promoção excluída");
         fetchPromotions();
       } catch (error) {
-        toast.error('Erro ao excluir');
+        toast.error("Erro ao excluir");
       }
     }
   };
@@ -67,9 +72,12 @@ const Promotions = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {promotions.map((promo) => (
-          <div key={promo.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div
+            key={promo._id}
+            className="bg-white rounded-lg shadow-md overflow-hidden"
+          >
             <img
-              src={promo.image || '/api/placeholder/400/200'}
+              src={promo.image || "/api/placeholder/400/200"}
               alt={promo.title}
               className="w-full h-40 object-cover"
             />
@@ -88,17 +96,14 @@ const Promotions = () => {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => {
-                      setEditingPromo(promo);
-                      setShowForm(true);
-                    }}
+                    onClick={() => handleEdit(promo)}
                   >
                     <Edit size={16} />
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDelete(promo.id)}
+                    onClick={() => handleDelete(promo._id)}
                   >
                     <Trash2 size={16} />
                   </Button>
@@ -109,6 +114,7 @@ const Promotions = () => {
         ))}
       </div>
 
+      {/* Modal – exibido apenas quando showForm for true */}
       {showForm && (
         <PromotionForm
           promotion={editingPromo}

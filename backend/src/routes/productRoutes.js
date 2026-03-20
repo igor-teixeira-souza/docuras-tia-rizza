@@ -1,25 +1,20 @@
 const express = require("express");
 const router = express.Router();
-
 const productController = require("../controllers/productController");
-const validateProduct = require("../middleware/validateProduct");
-const upload = require("../middleware/upload");
-const { adminMiddleware } = require("../middleware/auth");
+const { authMiddleware, adminMiddleware } = require("../middleware/auth");
 
-router.post(
-  "/",
+// Rotas públicas (GET) podem não precisar de auth
+router.get("/", productController.getAll);
+router.get("/:id", productController.getById);
+
+// Rotas protegidas (CRUD) devem usar authMiddleware + adminMiddleware
+router.post("/", authMiddleware, adminMiddleware, productController.create);
+router.put("/:id", authMiddleware, adminMiddleware, productController.update);
+router.delete(
+  "/:id",
+  authMiddleware,
   adminMiddleware,
-  upload.single("image"),
-  validateProduct,
-  productController.createProduct,
+  productController.delete,
 );
-
-router.get("/", productController.getProducts);
-
-router.get("/:id", productController.getProductById);
-
-router.put("/:id", adminMiddleware, validateProduct, productController.updateProduct);
-
-router.delete("/:id", adminMiddleware, productController.deleteProduct);
 
 module.exports = router;

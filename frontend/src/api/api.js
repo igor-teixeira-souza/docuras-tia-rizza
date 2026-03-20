@@ -4,6 +4,7 @@ export const api = axios.create({
   baseURL: "/api",
 });
 
+// Interceptor para adicionar o token em todas as requisições
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
