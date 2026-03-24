@@ -11,6 +11,7 @@ const settingsSchema = new mongoose.Schema(
     instagram: { type: String, default: "" },
     facebook: { type: String, default: "" },
     whatsapp: { type: String, default: "" },
+    heroImage: { type: String, default: "" },
   },
   { timestamps: true },
 );

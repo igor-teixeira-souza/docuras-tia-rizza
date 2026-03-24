@@ -50,7 +50,11 @@ const Promotions = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Tem certeza que deseja excluir esta promoção?")) {
+    if (!id) {
+      toast.error("ID inválido");
+      return;
+    }
+    if (window.confirm("Tem certeza?")) {
       try {
         await promotionsAPI.delete(id);
         toast.success("Promoção excluída");

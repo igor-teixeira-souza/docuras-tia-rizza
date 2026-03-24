@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -8,11 +9,12 @@ const { Server } = require("socket.io");
 const connectDB = require("./database/mongo");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
-const usersRoutes = require("./routes/UsersRoutes"); // ou "./routes/usersRoutes"
+const usersRoutes = require("./routes/UsersRoutes");
 const authRoutes = require("./routes/authRoutes");
 const User = require("./models/User");
-const settingsRoutes = require('./routes/settingsRoutes');
-const promotionRoutes = require('./routes/promotionRoutes');
+const settingsRoutes = require("./routes/settingsRoutes");
+const promotionRoutes = require("./routes/promotionRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 const bcrypt = require("bcrypt");
 const app = express();
 
@@ -22,15 +24,21 @@ connectDB();
 // Middlewares
 app.use(cors());
 app.use(express.json());
-app.use("/images", express.static("src/uploads"));
+
+// Servir arquivos estáticos – ajuste o caminho para onde seus uploads são salvos
+// No controller, você usou path.join(__dirname, '../uploads/'), então os arquivos ficam em backend/uploads/
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Se você tiver também imagens em src/uploads, mantenha a linha abaixo, mas provavelmente não precisa.
+// app.use("/images", express.static("src/uploads"));
 
 // Rotas
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
-app.use('/api/settings', settingsRoutes);
-app.use('/api/promotions', promotionRoutes);
+app.use("/api/settings", settingsRoutes);
+app.use("/api/promotions", promotionRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Rota raiz
 app.get("/", (req, res) => {
@@ -67,7 +75,6 @@ createAdminIfNotExists();
 // Conexão socket
 io.on("connection", (socket) => {
   console.log("Novo cliente conectado:", socket.id);
-
   socket.on("disconnect", () => {
     console.log("Cliente desconectado:", socket.id);
   });
@@ -77,7 +84,6 @@ io.on("connection", (socket) => {
 app.set("io", io);
 
 const PORT = process.env.PORT || 3000;
-
 server.listen(PORT, () => {
   console.log("Servidor rodando na porta", PORT);
 });

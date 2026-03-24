@@ -3,13 +3,10 @@ const router = express.Router();
 const settingsController = require("../controllers/settingsController");
 const { authMiddleware, adminMiddleware } = require("../middleware/auth");
 
-// Apenas admin pode ver/editar configurações (opcional, mas recomendado)
-router.get(
-  "/",
-  authMiddleware,
-  adminMiddleware,
-  settingsController.getSettings,
-);
+// Rota GET: pública – qualquer um pode visualizar as configurações do site
+router.get("/", settingsController.getSettings);
+
+// Rota PUT: protegida – apenas admin pode atualizar as configurações
 router.put(
   "/",
   authMiddleware,

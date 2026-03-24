@@ -16,7 +16,7 @@ const ProductCard = ({ product, onAddToCart }) => {
   const imageUrl =
     product.image && !imgError
       ? product.image
-      : "https://placehold.co/400x300?text=Do%C3%A7uras+Tia+Rizza&bg=FFE4E1&text_color=000000";
+      : "https://placehold.co/1600x900?text=Doçuras+Tia+Rizza&bg=FFE4E1&text_color=000000"; // Imagem padrão
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-smooth group animate-slide-up h-full flex flex-col">

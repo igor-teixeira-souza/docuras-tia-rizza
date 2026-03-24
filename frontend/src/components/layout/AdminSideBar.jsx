@@ -26,13 +26,13 @@ const AdminSidebar = ({ isOpen, toggleSidebar, isDesktop }) => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 z-40 h-full bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 z-40 h-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       } ${isDesktop ? "md:translate-x-0" : ""}`}
     >
       <div className="flex flex-col h-full">
         {/* Logo e botão toggle */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
           {isOpen ? (
             <h2 className="text-xl font-bold text-pink-600">Admin</h2>
           ) : (
@@ -40,7 +40,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar, isDesktop }) => {
           )}
           <button
             onClick={toggleSidebar}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-smooth"
+            className="p-1 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500"
             aria-label={isOpen ? "Recolher menu" : "Expandir menu"}
           >
             {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
@@ -48,21 +48,25 @@ const AdminSidebar = ({ isOpen, toggleSidebar, isDesktop }) => {
         </div>
 
         {/* Navegação */}
-        <nav className="flex-1 overflow-y-auto py-4">
-          <ul className="space-y-2 px-2">
+        <nav className="flex-1 overflow-y-auto py-6">
+          <ul className="space-y-1 px-3">
             {navItems.map((item) => (
               <li key={item.to}>
                 <Link
                   to={item.to}
-                  onClick={() => !isDesktop && toggleSidebar()} // fecha sidebar no mobile após clicar
-                  className={`flex items-center px-4 py-3 rounded-lg transition-smooth ${
+                  onClick={() => !isDesktop && toggleSidebar?.()}
+                  className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
                     isActive(item.to)
-                      ? "bg-black text-white"
-                      : "hover:bg-gray-100"
+                      ? "bg-black text-white shadow-md"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-black"
                   }`}
                 >
                   <item.icon size={20} className="flex-shrink-0" />
-                  {isOpen && <span className="ml-3">{item.label}</span>}
+                  {isOpen && (
+                    <span className="ml-3 text-sm font-medium">
+                      {item.label}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}
@@ -70,15 +74,18 @@ const AdminSidebar = ({ isOpen, toggleSidebar, isDesktop }) => {
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-gray-200">
           <Link
             to="/"
-            className={`flex items-center px-4 py-3 rounded-lg hover:bg-gray-100 transition-smooth ${
-              !isOpen && "justify-center"
-            }`}
+            onClick={() => !isDesktop && toggleSidebar?.()}
+            className={`flex items-center rounded-lg transition-all duration-200 ${
+              !isOpen ? "justify-center" : ""
+            } text-gray-700 hover:bg-red-50 hover:text-red-600`}
           >
-            <LogOut size={20} />
-            {isOpen && <span className="ml-3">Sair</span>}
+            <div className="flex items-center px-4 py-3 rounded-lg w-full">
+              <LogOut size={20} className="flex-shrink-0" />
+              {isOpen && <span className="ml-3 text-sm font-medium">Sair</span>}
+            </div>
           </Link>
         </div>
       </div>
