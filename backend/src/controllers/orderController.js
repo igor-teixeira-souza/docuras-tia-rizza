@@ -1,5 +1,6 @@
 const orderService = require("../services/orderService");
 const Order = require("../models/Order");
+const emailService = require("../services/emailService");
 const Product = require("../models/Product");
 
 exports.createOrder = async (req, res) => {
@@ -21,13 +22,31 @@ exports.createOrder = async (req, res) => {
     const orderPayload = {
       customerName: customerName || customer,
       phone,
-      address,
+      address: address || "",
       products: orderProducts,
       total,
       userId: req.user.id, // Adicionar userId do usuário autenticado
     };
 
     const order = await Order.create(orderPayload);
+
+    // --- ENVIO DE E-MAIL ---
+    try {
+      // Busca o pedido com os dados populados para obter os nomes dos produtos
+      const populatedOrder = await Order.findById(order._id).populate(
+        "products.productId",
+        "name",
+      );
+      await emailService.sendOrderConfirmation(populatedOrder);
+      console.log(`✅ E-mail enviado para o administrador`);
+    } catch (emailError) {
+      console.error(
+        "❌ Erro ao enviar e-mail, mas pedido foi criado:",
+        emailError,
+      );
+      // Não interrompe o fluxo – o pedido já foi criado
+    }
+    // -----------------------
 
     // emitir socket
     const io = req.app.get("io");
@@ -45,7 +64,6 @@ exports.createOrder = async (req, res) => {
 exports.getOrders = async (req, res) => {
   try {
     const orders = await orderService.getOrders();
-
     res.json(orders);
   } catch (error) {
     res.status(500).json({
