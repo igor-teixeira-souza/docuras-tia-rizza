@@ -22,7 +22,7 @@ exports.createOrder = async (req, res) => {
     const orderPayload = {
       customerName: customerName || customer,
       phone,
-      address: address || "",
+      address,
       products: orderProducts,
       total,
       userId: req.user.id, // Adicionar userId do usuário autenticado
@@ -33,7 +33,7 @@ exports.createOrder = async (req, res) => {
     // --- ENVIO DE E-MAIL ---
     try {
       // Busca o pedido com os dados populados para obter os nomes dos produtos
-      const populatedOrder = await Order.findById(order._id).populate(
+          const populatedOrder = await Order.findById(order._id).populate(
         "products.productId",
         "name",
       );

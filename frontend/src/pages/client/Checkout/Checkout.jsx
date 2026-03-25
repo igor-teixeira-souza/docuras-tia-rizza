@@ -57,6 +57,7 @@ const Checkout = () => {
     if (!formData.phone.trim()) newErrors.phone = "Telefone é obrigatório";
     else if (!/^\d{10,11}$/.test(formData.phone))
       newErrors.phone = "Telefone inválido";
+    // Endereço é opcional, não precisa validar
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -80,10 +81,24 @@ const Checkout = () => {
 
     setLoading(true);
     try {
+      // Trata o endereço: se estiver vazio ou apenas espaços, envia undefined
+      const addressValue =
+        formData.address && formData.address.trim() !== ""
+          ? formData.address.trim()
+          : undefined;
+
+      console.log("📦 Dados enviados:", {
+        customer: formData.customerName,
+        phone: formData.phone.replace(/\D/g, ""),
+        address: addressValue,
+        itemsCount: cartItems.length,
+        total: cartTotal,
+      });
+
       const orderData = {
         customer: formData.customerName,
         phone: formData.phone.replace(/\D/g, ""),
-        address: formData.address || undefined,
+        address: addressValue,
         items: cartItems.map((item) => ({
           productId: item.product.id || item.product._id,
           quantity: item.quantity,
@@ -91,6 +106,7 @@ const Checkout = () => {
         })),
         total: cartTotal,
       };
+
       const response = await ordersAPI.create(orderData);
       setOrderNumber(response.data.id || "N/A");
       setShowSuccessModal(true);
