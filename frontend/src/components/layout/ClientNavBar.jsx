@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu as MenuIcon, X, ShoppingCart, Shield } from "lucide-react";
+import { Menu as MenuIcon, X, ShoppingCart, Shield, Heart } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { UserMenu, AuthButtons } from "../features/AuthComponents";
 
@@ -16,7 +16,6 @@ const ClientNavbar = ({ cartCount }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fecha o menu mobile ao mudar de rota
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
@@ -29,10 +28,10 @@ const ClientNavbar = ({ cartCount }) => {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-md"
-          : "bg-gradient-to-b from-primary/90 to-transparent"
+          ? "bg-white/98 backdrop-blur-md shadow-lg"
+          : "bg-gradient-to-b from-primary via-primary/95 to-transparent"
       }`}
     >
       <div className="container-custom">
@@ -40,9 +39,12 @@ const ClientNavbar = ({ cartCount }) => {
           {/* Logo */}
           <Link
             to="/"
-            className="text-2xl font-bold text-black hover:text-pink-600 transition-colors"
+            className="text-2xl font-bold text-black hover:text-pink-600 transition-colors group"
           >
-            Doçuras da <span className="text-pink-600">Tia Rizza</span>
+            Doçuras da{" "}
+            <span className="text-pink-600 group-hover:text-black transition-colors">
+              Tia Rizza
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -51,20 +53,19 @@ const ClientNavbar = ({ cartCount }) => {
               <Link
                 key={to}
                 to={to}
-                className={`group relative flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
+                className={`group relative flex items-center px-3 py-2 rounded-xl transition-all duration-200 ${
                   location.pathname === to
                     ? "bg-white text-black font-semibold shadow-sm"
-                    : "text-gray-700 hover:bg-white/70 hover:text-black"
+                    : "text-gray-700 hover:bg-white/80 hover:text-black"
                 }`}
               >
-                {Icon && <Icon size={18} className="mr-1" />}
-                <span>{label}</span>
+                {Icon && <Icon size={18} className="mr-1.5" />}
+                <span className="text-sm font-medium">{label}</span>
                 {badge > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-scale-up shadow-sm">
+                  <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 animate-scale-up shadow-sm">
                     {badge > 99 ? "99+" : badge}
                   </span>
                 )}
-                {/* Linha indicadora */}
                 <div
                   className={`absolute bottom-0 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
                     location.pathname === to
@@ -75,18 +76,18 @@ const ClientNavbar = ({ cartCount }) => {
               </Link>
             ))}
 
-            {/* Link Admin – apenas para admins */}
+            {/* Link Admin */}
             {isAuthenticated && isAdmin && (
               <Link
                 to="/admin"
-                className={`group relative flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
+                className={`group relative flex items-center px-3 py-2 rounded-xl transition-all duration-200 ${
                   location.pathname.startsWith("/admin")
                     ? "bg-white text-black font-semibold shadow-sm"
-                    : "text-gray-700 hover:bg-white/70 hover:text-black"
+                    : "text-gray-700 hover:bg-white/80 hover:text-black"
                 }`}
               >
-                <Shield size={18} className="mr-1" />
-                <span>Admin</span>
+                <Shield size={18} className="mr-1.5" />
+                <span className="text-sm font-medium">Admin</span>
                 <div
                   className={`absolute bottom-0 left-0 h-0.5 bg-pink-600 transition-all duration-300 ${
                     location.pathname.startsWith("/admin")
@@ -97,14 +98,13 @@ const ClientNavbar = ({ cartCount }) => {
               </Link>
             )}
 
-            {/* Componentes de autenticação (UserMenu ou AuthButtons) */}
             {isAuthenticated ? <UserMenu /> : <AuthButtons />}
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-white/70 transition-all"
+            className="md:hidden p-2 rounded-xl hover:bg-white/80 transition-all focus:outline-none focus:ring-2 focus:ring-pink-500"
             aria-label="Menu"
           >
             {isOpen ? <X size={24} /> : <MenuIcon size={24} />}
@@ -113,49 +113,47 @@ const ClientNavbar = ({ cartCount }) => {
 
         {/* Mobile Menu */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ${
-            isOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
+          className={`md:hidden overflow-hidden transition-all duration-500 ${
+            isOpen ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="py-4 space-y-2 border-t border-gray-200">
+          <div className="py-4 space-y-2 border-t border-gray-200 bg-white/95 rounded-b-2xl">
             {navLinks.map(({ to, label, badge }) => (
               <Link
                 key={to}
                 to={to}
-                className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all ${
+                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
                   location.pathname === to
-                    ? "bg-white font-semibold"
-                    : "hover:bg-white/50"
+                    ? "bg-pink-50 font-semibold"
+                    : "hover:bg-gray-50"
                 }`}
                 onClick={() => setIsOpen(false)}
               >
-                <span>{label}</span>
+                <span className="text-gray-800">{label}</span>
                 {badge > 0 && (
-                  <span className="bg-pink-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                  <span className="bg-pink-600 text-white text-xs font-bold rounded-full px-2.5 py-1">
                     {badge}
                   </span>
                 )}
               </Link>
             ))}
 
-            {/* Link Admin mobile */}
             {isAuthenticated && isAdmin && (
               <Link
                 to="/admin"
-                className={`flex items-center px-4 py-3 rounded-lg transition-all ${
+                className={`flex items-center px-4 py-3 rounded-xl transition-all ${
                   location.pathname.startsWith("/admin")
-                    ? "bg-white font-semibold"
-                    : "hover:bg-white/50"
+                    ? "bg-pink-50 font-semibold"
+                    : "hover:bg-gray-50"
                 }`}
                 onClick={() => setIsOpen(false)}
               >
-                <Shield size={18} className="mr-2" />
-                <span>Admin</span>
+                <Shield size={18} className="mr-2 text-pink-600" />
+                <span className="text-gray-800">Admin</span>
               </Link>
             )}
 
-            {/* Componentes de autenticação para mobile */}
-            <div className="pt-2 border-t border-gray-200">
+            <div className="pt-3 mt-2 border-t border-gray-100">
               {isAuthenticated ? <UserMenu mobile /> : <AuthButtons mobile />}
             </div>
           </div>

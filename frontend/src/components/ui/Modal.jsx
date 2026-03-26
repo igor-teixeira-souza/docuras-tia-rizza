@@ -1,38 +1,58 @@
-import React, { useEffect } from 'react';
-import Button from './Button';
+import React, { useEffect } from "react";
+import { X } from "lucide-react";
+import Button from "./Button";
 
-const Modal = ({ isOpen, onClose, title, children, onConfirm }) => {
+const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
-    return () => { document.body.style.overflow = 'unset'; };
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
+  const sizes = {
+    sm: "max-w-md",
+    md: "max-w-2xl",
+    lg: "max-w-4xl",
+    xl: "max-w-6xl",
+  };
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto animate-fade-in">
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={onClose} />
-        <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-        <div className="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full animate-scale-up">
-          <div className="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">{title}</h3>
-            <div className="mt-3">{children}</div>
-          </div>
-          <div className="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-            {onConfirm && (
-              <Button onClick={onConfirm} className="ml-3">
-                Confirmar
-              </Button>
-            )}
-            <Button variant="secondary" onClick={onClose}>
-              Cancelar
-            </Button>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+        onClick={onClose}
+      />
+
+      {/* Modal content */}
+      <div
+        className={`relative bg-white rounded-2xl shadow-2xl w-full ${sizes[size]} max-h-[90vh] overflow-hidden animate-scale-up`}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-pink-50 to-white">
+          <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-black"
+            aria-label="Fechar"
+          >
+            <X size={20} className="text-gray-500 hover:text-gray-700" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div
+          className="overflow-y-auto p-6"
+          style={{ maxHeight: "calc(90vh - 80px)" }}
+        >
+          {children}
         </div>
       </div>
     </div>

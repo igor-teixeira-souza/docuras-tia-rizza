@@ -1,4 +1,5 @@
 import React from "react";
+import { Heart } from "lucide-react";
 
 const AdminFooter = ({ sidebarOpen }) => {
   const currentYear = new Date().getFullYear();
@@ -10,18 +11,26 @@ const AdminFooter = ({ sidebarOpen }) => {
       }`}
     >
       <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-        <p>&copy; {currentYear} Doçuras da Tia Rizza. Painel Administrativo</p>
-        <div className="flex space-x-4 mt-2 md:mt-0">
-          <a href="/termos" className="hover:text-pink-600 transition-smooth">
+        <div className="flex items-center gap-2">
+          <span>&copy; {currentYear} Doçuras da Tia Rizza.</span>
+          <span className="hidden md:inline">|</span>
+          <span className="flex items-center gap-1">
+            Feito com{" "}
+            <Heart size={14} className="text-pink-500 fill-pink-500" /> para
+            você
+          </span>
+        </div>
+        <div className="flex space-x-6 mt-2 md:mt-0">
+          <a href="/termos" className="hover:text-pink-600 transition-colors">
             Termos
           </a>
           <a
             href="/privacidade"
-            className="hover:text-pink-600 transition-smooth"
+            className="hover:text-pink-600 transition-colors"
           >
             Privacidade
           </a>
-          <a href="/ajuda" className="hover:text-pink-600 transition-smooth">
+          <a href="/ajuda" className="hover:text-pink-600 transition-colors">
             Ajuda
           </a>
         </div>
@@ -31,4 +40,3 @@ const AdminFooter = ({ sidebarOpen }) => {
 };
 
 export default AdminFooter;
-    

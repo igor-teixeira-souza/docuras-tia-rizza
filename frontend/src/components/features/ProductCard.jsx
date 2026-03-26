@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Button from "../ui/Button";
-import { ShoppingCart, Check } from "lucide-react";
+import { Check } from "lucide-react";
 
 const ProductCard = ({ product, onAddToCart }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -13,13 +13,14 @@ const ProductCard = ({ product, onAddToCart }) => {
     setTimeout(() => setAdded(false), 2000);
   };
 
+  // Placeholder confiável
+  const placeholderImage =
+    "https://placehold.co/400x300?text=Doçuras+Tia+Rizza&bg=FFE4E1&text_color=000000";
   const imageUrl =
-    product.image && !imgError
-      ? product.image
-      : "https://placehold.co/1600x900?text=Doçuras+Tia+Rizza&bg=FFE4E1&text_color=000000"; // Imagem padrão
+    product.image && !imgError ? product.image : placeholderImage;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-smooth group animate-slide-up h-full flex flex-col">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group animate-slide-up h-full flex flex-col">
       <div className="relative overflow-hidden h-48 flex-shrink-0">
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gray-200 animate-pulse" />
@@ -34,7 +35,7 @@ const ProductCard = ({ product, onAddToCart }) => {
           onError={() => setImgError(true)}
         />
         <div
-          className={`absolute top-2 right-2 bg-green-500 text-white rounded-full p-2 transition-smooth ${
+          className={`absolute top-2 right-2 bg-green-500 text-white rounded-full p-2 transition-all duration-300 ${
             added ? "opacity-100 scale-100" : "opacity-0 scale-0"
           }`}
         >
@@ -42,23 +43,18 @@ const ProductCard = ({ product, onAddToCart }) => {
         </div>
       </div>
       <div className="p-4 flex flex-col flex-grow">
-        <h3 className="text-lg font-semibold mb-1 line-clamp-1">
+        <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
           {product.name}
         </h3>
         <p className="text-gray-600 text-sm mb-3 line-clamp-2 flex-grow">
           {product.description}
         </p>
         <div className="flex items-center justify-between mt-auto">
-          <span className="text-xl font-bold text-black">
+          <span className="text-xl font-bold text-gray-900">
             R$ {product.price?.toFixed(2)}
           </span>
-          <Button
-            size="sm"
-            onClick={handleAddToCart}
-            className="flex items-center space-x-1 bg-black hover:bg-gray-800"
-          >
-            <ShoppingCart size={16} />
-            <span>Adicionar</span>
+          <Button variant="primary" size="sm" onClick={handleAddToCart}>
+            Adicionar
           </Button>
         </div>
       </div>
