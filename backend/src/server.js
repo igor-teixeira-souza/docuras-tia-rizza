@@ -2,6 +2,14 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
+console.log(
+  "JWT_SECRET carregado?",
+  process.env.JWT_SECRET ? "✅ Sim" : "❌ Não",
+);
+console.log(
+  "EMAIL_USER carregado?",
+  process.env.EMAIL_USER ? "✅ Sim" : "❌ Não",
+);
 
 const http = require("http");
 const { Server } = require("socket.io");
