@@ -1,0 +1,26 @@
+* [33m0d94846[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrecovery[m[33m)[m New update in .env
+* [33mf1334e0[m fix: ignore .env
+*   [33m863c144[m Merge branch 'main' of https://github.com/igor-teixeira-souza/docuras-tia-rizza
+[32m|[m[33m\[m  
+[32m|[m * [33m9370d37[m Update .gitignore
+* [33m|[m [33m10a43a4[m Merge branch 'main' of https://github.com/igor-teixeira-souza/docuras-tia-rizza
+[34m|[m[33m\[m[33m|[m 
+[34m|[m * [33mce3151d[m Update .env
+* [35m|[m [33md1d1646[m update
+* [35m|[m [33m2b59748[m chore: remove .env from repository and add to gitignore
+* [35m|[m [33me0306dc[m update
+* [35m|[m [33mc93a13d[m update
+* [35m|[m [33m5025ad4[m ultimo update
+[35m|[m[35m/[m  
+* [33m30f5dee[m Ultima atualização
+* [33mdadd98d[m Sites update
+* [33m350ef7b[m Admin page configuration
+* [33m1008b5c[m Client update
+* [33m4bad509[m feat: Enhance cart and checkout functionality with improved validation, filtering, and UI updates
+* [33m3b77d39[m feat: Enhance product management with validation, error handling, and improved UI
+* [33m14f4d00[m feat: Implement admin and client routes, including order and product management
+* [33m1c115c0[m feat: add admin dashboard components and client menu functionality
+* [33mff9b69f[m feat: add OrdersDashboard, RecentOrdersTable, StatsCards, and TopProducts components
+* [33m1bdae52[m feat: integrate Tailwind CSS and set up routing for client and admin pages
+* [33m37961f4[m Adds order and product statistics endpoints
+* [33m8de1634[m Adds full-stack boilerplate for product and order management
