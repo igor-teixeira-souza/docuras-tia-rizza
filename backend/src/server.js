@@ -1,7 +1,25 @@
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
-require("dotenv").config();
+const http = require("http");
+const { Server } = require("socket.io");
+const bcrypt = require("bcrypt");
+
+const connectDB = require("./database/mongo");
+const productRoutes = require("./routes/productRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const usersRoutes = require("./routes/UsersRoutes");
+const authRoutes = require("./routes/authRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
+const promotionRoutes = require("./routes/promotionRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
+const User = require("./models/User");
+
+const app = express();
+
+// 🔍 Logs de debug (importante no Render)
 console.log(
   "JWT_SECRET carregado?",
   process.env.JWT_SECRET ? "✅ Sim" : "❌ Não",
@@ -10,34 +28,17 @@ console.log(
   "EMAIL_USER carregado?",
   process.env.EMAIL_USER ? "✅ Sim" : "❌ Não",
 );
-
-const http = require("http");
-const { Server } = require("socket.io");
-
-const connectDB = require("./database/mongo");
-const productRoutes = require("./routes/productRoutes");
-const orderRoutes = require("./routes/orderRoutes");
-const usersRoutes = require("./routes/UsersRoutes");
-const authRoutes = require("./routes/authRoutes");
-const User = require("./models/User");
-const settingsRoutes = require("./routes/settingsRoutes");
-const promotionRoutes = require("./routes/promotionRoutes");
-const uploadRoutes = require("./routes/uploadRoutes");
-const bcrypt = require("bcrypt");
-const app = express();
-
-// Conectar banco
-connectDB();
+console.log(
+  "MONGO_URI carregado?",
+  process.env.MONGO_URI ? "✅ Sim" : "❌ Não",
+);
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Servir arquivos estáticos – ajuste o caminho para onde seus uploads são salvos
-// No controller, você usou path.join(__dirname, '../uploads/'), então os arquivos ficam em backend/uploads/
+// Arquivos estáticos
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-// Se você tiver também imagens em src/uploads, mantenha a linha abaixo, mas provavelmente não precisa.
-// app.use("/images", express.static("src/uploads"));
 
 // Rotas
 app.use("/api/products", productRoutes);
@@ -56,42 +57,62 @@ app.get("/", (req, res) => {
 // Criar servidor HTTP
 const server = http.createServer(app);
 
-// Criar Socket
+// Socket.io
 const io = new Server(server, {
   cors: {
     origin: "*",
   },
 });
 
+app.set("io", io);
+
+io.on("connection", (socket) => {
+  console.log("Novo cliente conectado:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Cliente desconectado:", socket.id);
+  });
+});
+
+// Criar admin automático
 const createAdminIfNotExists = async () => {
-  const adminEmail = "admin@docurastiarizza.com";
+  const adminEmail = process.env.ADMIN_EMAIL;
+
   const existingAdmin = await User.findOne({ email: adminEmail });
+
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash("sua-senha-segura-aqui", 10);
+
     await User.create({
       name: "Administrador",
       email: adminEmail,
       password: hashedPassword,
       role: "admin",
     });
+
     console.log("✅ Administrador criado com sucesso!");
   }
 };
 
-createAdminIfNotExists();
+// 🚀 INICIALIZAÇÃO CORRETA
+const startServer = async () => {
+  try {
+    if (!process.env.MONGO_URI) {
+      throw new Error("MONGO_URI não definida!");
+    }
 
-// Conexão socket
-io.on("connection", (socket) => {
-  console.log("Novo cliente conectado:", socket.id);
-  socket.on("disconnect", () => {
-    console.log("Cliente desconectado:", socket.id);
-  });
-});
+    await connectDB();
+    await createAdminIfNotExists();
 
-// salvar io global
-app.set("io", io);
+    const PORT = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log("Servidor rodando na porta", PORT);
-});
+    server.listen(PORT, () => {
+      console.log("🚀 Servidor rodando na porta", PORT);
+    });
+  } catch (err) {
+    console.error("❌ Erro ao iniciar servidor:", err.message);
+    process.exit(1);
+  }
+};
+
+startServer();
