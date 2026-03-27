@@ -66,7 +66,7 @@ console.log("Cliente desconectado:", socket.id);
 });
 });
 
-// Criar admin automático com proteção
+// Criar admin automático
 const createAdminIfNotExists = async () => {
 try {
 const adminEmail = process.env.ADMIN_EMAIL;
