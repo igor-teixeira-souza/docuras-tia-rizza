@@ -19,11 +19,11 @@ const User = require("./models/User");
 
 const app = express();
 
-// 🔍 Logs de debug (Render)
-console.log("JWT_SECRET carregado?", process.env.JWT_SECRET ? "✅ Sim" : "❌ Não");
-console.log("EMAIL_USER carregado?", process.env.EMAIL_USER ? "✅ Sim" : "❌ Não");
-console.log("MONGO_URI carregado?", process.env.MONGO_URI ? "✅ Sim" : "❌ Não");
-console.log("ADMIN_EMAIL carregado?", process.env.ADMIN_EMAIL ? "✅ Sim" : "❌ Não");
+// Logs de debug (Render)
+console.log("JWT_SECRET carregado?", process.env.JWT_SECRET ? "Sim" : "Nao");
+console.log("EMAIL_USER carregado?", process.env.EMAIL_USER ? "Sim" : "Nao");
+console.log("MONGO_URI carregado?", process.env.MONGO_URI ? "Sim" : "Nao");
+console.log("ADMIN_EMAIL carregado?", process.env.ADMIN_EMAIL ? "Sim" : "Nao");
 
 // Middlewares
 app.use(cors());
@@ -43,7 +43,7 @@ app.use("/api/upload", uploadRoutes);
 
 // Rota raiz
 app.get("/", (req, res) => {
-res.send("API Doçuras da Tia Rizza funcionando 🍰");
+res.send("API Docuras da Tia Rizza funcionando");
 });
 
 // Criar servidor HTTP
@@ -59,21 +59,21 @@ origin: "*",
 app.set("io", io);
 
 io.on("connection", (socket) => {
-console.log("🔌 Novo cliente conectado:", socket.id);
+console.log("Cliente conectado:", socket.id);
 
 socket.on("disconnect", () => {
-console.log("❌ Cliente desconectado:", socket.id);
+console.log("Cliente desconectado:", socket.id);
 });
 });
 
-// 🔐 Criar admin automático (seguro)
+// Criar admin automático com proteção
 const createAdminIfNotExists = async () => {
 try {
 const adminEmail = process.env.ADMIN_EMAIL;
 
 ```
 if (!adminEmail) {
-  console.log("⚠️ ADMIN_EMAIL não definido, pulando criação do admin");
+  console.log("ADMIN_EMAIL nao definido, pulando criacao do admin");
   return;
 }
 
@@ -89,42 +89,42 @@ if (!existingAdmin) {
     role: "admin",
   });
 
-  console.log("✅ Administrador criado com sucesso!");
+  console.log("Administrador criado com sucesso");
 } else {
-  console.log("ℹ️ Admin já existe");
+  console.log("Admin ja existe");
 }
 ```
 
 } catch (err) {
-console.error("❌ Erro ao criar/verificar admin:", err);
-throw err; // importante: propaga erro
+console.error("Erro ao criar/verificar admin:", err);
+throw err;
 }
 };
 
-// 🚀 Inicialização do servidor
+// Inicializacao do servidor
 const startServer = async () => {
 try {
-console.log("🚀 Iniciando servidor...");
+console.log("Iniciando servidor...");
 
 ```
 if (!process.env.MONGO_URI) {
-  throw new Error("MONGO_URI não definida!");
+  throw new Error("MONGO_URI nao definida");
 }
 
 await connectDB();
-console.log("✅ Banco conectado");
+console.log("Banco conectado");
 
 await createAdminIfNotExists();
 
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log("Servidor rodando na porta " + PORT);
 });
 ```
 
 } catch (err) {
-console.error("❌ ERRO CRÍTICO AO INICIAR:", err);
+console.error("ERRO CRITICO AO INICIAR:", err);
 process.exit(1);
 }
 };
