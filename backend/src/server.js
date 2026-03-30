@@ -9,9 +9,7 @@ const bcrypt = require("bcrypt");
 
 const connectDB = require("./database/mongo");
 
-// 🔥 DEBUG IMPORTANTE
-console.log("TIPO connectDB:", typeof connectDB);
-
+// Rotas
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const usersRoutes = require("./routes/usersRoutes");
@@ -19,11 +17,12 @@ const authRoutes = require("./routes/authRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const promotionRoutes = require("./routes/promotionRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
+
 const User = require("./models/User");
 
 const app = express();
 
-// Logs de debug (.env)
+// 🔹 Debug das variáveis de ambiente
 console.log("JWT_SECRET carregado?", process.env.JWT_SECRET ? "Sim" : "Nao");
 console.log("EMAIL_USER carregado?", process.env.EMAIL_USER ? "Sim" : "Nao");
 console.log("MONGO_URI carregado?", process.env.MONGO_URI ? "Sim" : "Nao");
@@ -36,7 +35,19 @@ app.use(express.json());
 // Arquivos estáticos
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Rotas
+// 🔹 Rota raiz
+app.get("/", (req, res) => {
+  res.send("API Docuras da Tia Rizza funcionando");
+});
+
+// 🔹 Rota de teste
+app.get("/api/test", (req, res) => {
+  console.log("Rota /api/test acessada");
+  res.json({ message: "Rota de teste funcionando!" });
+});
+
+// 🔹 Registrar rotas
+console.log("Registrando rotas...");
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
@@ -45,10 +56,25 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/promotions", promotionRoutes);
 app.use("/api/upload", uploadRoutes);
 
-// Rota raiz
-app.get("/", (req, res) => {
-  res.send("API Docuras da Tia Rizza funcionando");
-});
+// 🔹 Função segura para logar rotas
+function logRoutes() {
+  if (!app._router) {
+    console.warn(
+      "⚠️ app._router ainda nao existe. Rotas não podem ser listadas agora.",
+    );
+    return;
+  }
+  console.log("🟢 Rotas registradas no Express:");
+  app._router.stack
+    .filter((r) => r.route)
+    .forEach((r) => {
+      const methods = Object.keys(r.route.methods).join(", ").toUpperCase();
+      console.log(`${methods} -> ${r.route.path}`);
+    });
+}
+
+// Delay para garantir que rotas foram registradas
+setTimeout(logRoutes, 3000);
 
 // Criar servidor HTTP
 const server = http.createServer(app);
@@ -59,7 +85,6 @@ const io = new Server(server, {
     origin: "*",
   },
 });
-
 app.set("io", io);
 
 io.on("connection", (socket) => {
@@ -122,7 +147,6 @@ const startServer = async () => {
     server.listen(PORT, () => {
       console.log("Servidor rodando na porta " + PORT);
     });
-
   } catch (err) {
     console.error("ERRO CRITICO AO INICIAR:", err);
     process.exit(1);

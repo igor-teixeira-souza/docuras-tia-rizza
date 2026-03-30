@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "/api",
+  baseURL: "https://docuras-tia-rizza.onrender.com",
 });
 
 // Interceptor para adicionar o token em todas as requisições
