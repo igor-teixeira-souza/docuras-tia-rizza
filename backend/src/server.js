@@ -1,156 +1,75 @@
+// src/server.js
 require("dotenv").config();
-
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
-const bcrypt = require("bcrypt");
-
 const connectDB = require("./database/mongo");
 
-// Rotas
+// Importar rotas
 const productRoutes = require("./routes/productRoutes");
-const orderRoutes = require("./routes/orderRoutes");
+const promotionRoutes = require("./routes/promotionRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 const authRoutes = require("./routes/authRoutes");
-const settingsRoutes = require("./routes/settingsRoutes");
-const promotionRoutes = require("./routes/promotionRoutes");
-const uploadRoutes = require("./routes/uploadRoutes");
-
-const User = require("./models/User");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  },
+});
 
-// 🔹 Debug das variáveis de ambiente
-console.log("JWT_SECRET carregado?", process.env.JWT_SECRET ? "Sim" : "Nao");
-console.log("EMAIL_USER carregado?", process.env.EMAIL_USER ? "Sim" : "Nao");
-console.log("MONGO_URI carregado?", process.env.MONGO_URI ? "Sim" : "Nao");
-console.log("ADMIN_EMAIL carregado?", process.env.ADMIN_EMAIL ? "Sim" : "Nao");
+// Torna o io acessível nos controllers
+app.set("io", io);
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Arquivos estáticos
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Servir arquivos estáticos (uploads)
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// 🔹 Rota raiz
-app.get("/", (req, res) => {
-  res.send("API Docuras da Tia Rizza funcionando");
-});
-
-// 🔹 Rota de teste
-app.get("/api/test", (req, res) => {
-  console.log("Rota /api/test acessada");
-  res.json({ message: "Rota de teste funcionando!" });
-});
-
-// 🔹 Registrar rotas
-console.log("Registrando rotas...");
+// Prefixo /api para todas as rotas
 app.use("/api/products", productRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/users", usersRoutes);
-app.use("/api/settings", settingsRoutes);
 app.use("/api/promotions", promotionRoutes);
-app.use("/api/upload", uploadRoutes);
+app.use("/api/settings", settingsRoutes);
+app.use("/api/uploads", uploadRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
 
-// 🔹 Função segura para logar rotas
-function logRoutes() {
-  if (!app._router) {
-    console.warn(
-      "⚠️ app._router ainda nao existe. Rotas não podem ser listadas agora.",
-    );
-    return;
-  }
-  console.log("🟢 Rotas registradas no Express:");
-  app._router.stack
-    .filter((r) => r.route)
-    .forEach((r) => {
-      const methods = Object.keys(r.route.methods).join(", ").toUpperCase();
-      console.log(`${methods} -> ${r.route.path}`);
-    });
-}
-
-// Delay para garantir que rotas foram registradas
-setTimeout(logRoutes, 3000);
-
-// Criar servidor HTTP
-const server = http.createServer(app);
-
-// Socket.io
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-  },
+// Rota raiz apenas de teste
+app.get("/", (req, res) => {
+  res.send("API Docuras Tia Rizza funcionando!");
 });
-app.set("io", io);
 
+// Conectar MongoDB e iniciar servidor
+const PORT = process.env.PORT || 3000;
+
+connectDB()
+  .then(() => {
+    console.log("MongoDB conectado com sucesso");
+    server.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Erro ao conectar no MongoDB:", err);
+    process.exit(1);
+  });
+
+// Socket.IO
 io.on("connection", (socket) => {
-  console.log("Cliente conectado:", socket.id);
+  console.log("Novo cliente conectado:", socket.id);
 
   socket.on("disconnect", () => {
     console.log("Cliente desconectado:", socket.id);
   });
 });
-
-// Criar admin automático
-const createAdminIfNotExists = async () => {
-  try {
-    const adminEmail = process.env.ADMIN_EMAIL;
-
-    if (!adminEmail) {
-      console.log("ADMIN_EMAIL nao definido, pulando criacao do admin");
-      return;
-    }
-
-    const existingAdmin = await User.findOne({ email: adminEmail });
-
-    if (!existingAdmin) {
-      const hashedPassword = await bcrypt.hash("sua-senha-segura-aqui", 10);
-
-      await User.create({
-        name: "Administrador",
-        email: adminEmail,
-        password: hashedPassword,
-        role: "admin",
-      });
-
-      console.log("Administrador criado com sucesso");
-    } else {
-      console.log("Admin ja existe");
-    }
-  } catch (err) {
-    console.error("Erro ao criar/verificar admin:", err);
-    throw err;
-  }
-};
-
-// Inicializacao do servidor
-const startServer = async () => {
-  try {
-    console.log("Iniciando servidor...");
-
-    if (!process.env.MONGO_URI) {
-      throw new Error("MONGO_URI nao definida");
-    }
-
-    console.log("Chamando connectDB...");
-    await connectDB();
-    console.log("Banco conectado");
-
-    await createAdminIfNotExists();
-
-    const PORT = process.env.PORT || 3000;
-
-    server.listen(PORT, () => {
-      console.log("Servidor rodando na porta " + PORT);
-    });
-  } catch (err) {
-    console.error("ERRO CRITICO AO INICIAR:", err);
-    process.exit(1);
-  }
-};
-
-startServer();

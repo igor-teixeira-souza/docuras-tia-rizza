@@ -1,7 +1,8 @@
+// api.js
 import axios from "axios";
 
-export const api = axios.create({
-  baseURL: "https://docuras-tia-rizza.onrender.com",
+const api = axios.create({
+  baseURL: "https://docuras-tia-rizza.onrender.com/api",
 });
 
 // Interceptor para adicionar o token em todas as requisições
@@ -40,13 +41,6 @@ export const productsAPI = {
   delete: (id) => api.delete(`/products/${id}`),
 };
 
-export const ordersAPI = {
-  create: (data) => api.post("/orders", data),
-  getStats: () => api.get("/orders/stats"),
-  getAll: () => api.get("/orders"),
-  updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }),
-};
-
 export const promotionsAPI = {
   getAll: () => api.get("/promotions"),
   getById: (id) => api.get(`/promotions/${id}`),
@@ -58,4 +52,11 @@ export const promotionsAPI = {
 export const settingsAPI = {
   get: () => api.get("/settings"),
   update: (data) => api.put("/settings", data),
+};
+
+export const ordersAPI = {
+  create: (data) => api.post("/orders", data),
+  getAll: () => api.get("/orders"),
+  getStats: () => api.get("/orders/stats"),
+  updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }),
 };
