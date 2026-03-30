@@ -1,28 +1,25 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Sua fonte personalizada (já está sendo importada via link no HTML, mas precisa ser registrada no tema) */
-@theme {
-  --font-poppins: "Poppins", sans-serif;
-  /* Outras customizações de tema podem ser adicionadas aqui */
-  --color-primary: #FFE4E1;
-  --color-secondary: #FFDDEE;
-  --color-dark: #2D2D2D;
-}
-
-/* Seus estilos base e componentes customizados */
+/* Estilos base */
 @layer base {
   * {
-    @apply font-poppins; /* Agora a classe font-poppins existe */
+    font-family: "Poppins", sans-serif;
   }
+
   body {
-    @apply bg-primary text-dark;
+    background-color: #ffe4e1;
+    color: #2d2d2d;
   }
 }
 
+/* Componentes */
 @layer components {
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
+
   .transition-smooth {
     @apply transition-all duration-300 ease-in-out;
   }
